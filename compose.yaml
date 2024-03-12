@@ -1,55 +1,29 @@
-version: '3.5'
-
+version: '3.7'
 services:
-  mysql:
-    container_name: mysql_container
+  db:
     image: mysql:latest
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:- group15}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-company_database}
-      MYSQL_USER: ${MYSQL_USER:group15}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-group15}
+      MYSQL_DATABASE: group15_database
+      MYSQL_USER: group15
+      MYSQL_PASSWORD: group15password
+      MYSQL_ROOT_PASSWORD: group15password
     volumes:
-      - mysql:/var/lib/mysql
-    ports:
-      - "3306:3306"
+      - db_data:/var/lib/mysql
     networks:
-      - mysql
-    restart: unless-stopped
-
+      - app-network
   phpmyadmin:
-    container_name: phpmyadmin_container
-    image: phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
     environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-group15pass}
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: group15password
     ports:
-      - "${PHPMYADMIN_PORT:-8080}:80"
+      - '8080:80'
     networks:
-      - mysql
-    restart: unless-stopped
-
-  mariadb:
-    container_name: mariadb_container
-    image: mariadb:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mysql_paswd_2023}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-company_database}
-      MYSQL_USER: ${MYSQL_USER:-group15}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:group15 pass}
-    volumes:
-      - mariadb:/var/lib/mysql
-    ports:
-      - "3307:3306"
-    networks:
-      - mysql
-    restart: unless-stopped
-
+      - app-network
 networks:
-  mysql:
+  app-network:
     driver: bridge
-
 volumes:
-  mysql:
-  mariadb:
+  db_data:
